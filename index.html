@@ -1,250 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Particle Lab – Tilt Gravity + Tabs</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Particle Tilt Playground — Containers + Extra Turbulence</title>
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-<canvas id="c"></canvas>
+  <canvas id="c"></canvas>
 
-<div id="hud">
-  <div><span class="badge">FPS</span> <span id="fps">—</span> · <span class="badge">Particles</span> <span id="pcount">—</span></div>
-  <div><span class="badge">Mode</span> <span id="mode">elastic</span> · <span class="badge">Shape</span> <span id="shapeHUD">circle</span> · <span class="badge">Color</span> <span id="colorHUD">gradient</span></div>
-</div>
-
-<button id="toggleUI" title="Toggle UI (U)">⚙️ Controls</button>
-
-<div id="panel">
-  <div class="header">
-    <div><strong>Particle Lab</strong> <span class="badge">Tilt Gravity</span></div>
-    <div style="display:flex;gap:6px;align-items:center;">
-      <select id="presetSel" title="Presets">
-        <option value="">Presets…</option>
-        <option value="calmFlow">Calm Flow</option>
-        <option value="stormCurl">Storm Curl</option>
-        <option value="vortexPointer">Vortex (Pointer)</option>
-        <option value="fireworks">Fireworks</option>
-        <option value="brownianCloud">Brownian Cloud</option>
-        <option value="bouncyBalls">Bouncy Balls</option>
-        <option value="spaceWrap">Space Wrap</option>
-      </select>
-      <button id="pauseBtn" class="btn" title="Pause/Resume (Space)">⏸ Pause</button>
+  <div id="hud">
+    <div class="row">
+      <span class="tag">FPS: <b id="fps">0</b></span>
+      <span class="tag">Particles: <b id="pcount">0</b></span>
+      <span class="tag">Collisions: <b id="collMode">elastic</b></span>
+      <span class="tag">Turbulence: <b id="turbMode">none</b></span>
+      <span class="tag">Tilt: <b id="tiltState">off</b></span>
+      <span class="tag">Mouse Gravity: <b id="mouseG">on</b></span>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="btn" id="pauseBtn">Pause</button>
+      <button class="btn" id="stepBtn" title="Step one frame">Step</button>
+      <button class="btn" id="resetBtn" title="Reset particles">Reset</button>
     </div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-tab="essentials">Essentials</button>
-    <button class="tab" data-tab="physics">Physics</button>
-    <button class="tab" data-tab="collisions">Collisions</button>
-    <button class="tab" data-tab="turbulence">Turbulence</button>
-    <button class="tab" data-tab="interaction">Interaction</button>
-    <button class="tab" data-tab="advanced">Advanced</button>
-    <button id="uiBtn" class="btn" title="Hide Panel">🙈</button>
+  <button id="togglePanel">☰ Controls <small>(C)</small></button>
+
+  <div id="panel">
+    <div id="panelHeader">
+      <div class="title">Particle Tilt Playground</div>
+      <div class="actions">
+        <button id="enableTiltTop" class="primary">Enable Tilt</button>
+        <button id="randomize">Randomize</button>
+        <button id="presetMenu">Presets</button>
+      </div>
+    </div>
+    <div id="tabs"></div>
+    <div id="content"></div>
+    <div class="footerNote">Tip: On desktop, click anywhere to set gravity direction. On mobile, tap Enable Tilt.</div>
   </div>
 
-  <div class="content">
-    <!-- Essentials -->
-    <div class="tabpane" id="tab-essentials">
-      <div class="section">
-        <h4>Basics</h4>
-        <div class="row"><label for="count">Particle count</label><input id="count" type="range" min="10" max="8000" step="10" value="900"><input id="countNum" type="number" step="10" value="900"></div>
-        <div class="row"><label for="uniformSize">Size mode</label>
-          <select id="uniformSize"><option value="varied">Varied</option><option value="uniform">Uniform</option></select><span></span></div>
-        <div id="sizeVar">
-          <div class="row"><label for="sizeMin">Size min</label><input id="sizeMin" type="range" min="1" max="40" step="1" value="2"><input id="sizeMinNum" type="number" step="1" value="2"></div>
-          <div class="row"><label for="sizeMax">Size max</label><input id="sizeMax" type="range" min="2" max="80" step="1" value="10"><input id="sizeMaxNum" type="number" step="1" value="10"></div>
+  <div id="tiltPrompt" hidden>
+    <div class="bubble">
+      <div class="row">
+        <div class="flex" style="flex:1;gap:10px">
+          <span class="chip">📱 Device Tilt</span>
+          <div>To roll marbles with your phone, grant motion permission.</div>
         </div>
-        <div id="sizeUni" style="display:none;">
-          <div class="row"><label for="sizeUniVal">Size</label><input id="sizeUniVal" type="range" min="1" max="60" step="1" value="8"><input id="sizeUniNum" type="number" step="1" value="8"></div>
-        </div>
-      </div>
-      <div class="section">
-        <h4>Look</h4>
-        <div class="row"><label for="shape">Shape</label>
-          <select id="shape">
-            <option value="circle">Circle</option>
-            <option value="square">Square</option>
-            <option value="triangle">Triangle</option>
-            <option value="ngon">Polygon</option>
-            <option value="star">Star</option>
-          </select><span></span></div>
-        <div id="polyControls">
-          <div class="row"><label for="polySides">Polygon sides</label><input id="polySides" type="range" min="3" max="10" step="1" value="5"><input id="polySidesNum" type="number" step="1" value="5"></div>
-          <div class="row"><label for="starPoints">Star points</label><input id="starPoints" type="range" min="4" max="12" step="1" value="5"><input id="starPointsNum" type="number" step="1" value="5"></div>
-          <div class="row"><label for="starInner">Star inner ratio</label><input id="starInner" type="range" min="0.2" max="0.95" step="0.01" value="0.5"><input id="starInnerNum" type="number" step="0.01" value="0.5"></div>
-        </div>
-        <div class="row"><label for="colorMode">Color mode</label>
-          <select id="colorMode">
-            <option value="gradient">Gradient</option>
-            <option value="single">Single</option>
-            <option value="random">Random</option>
-            <option value="velocity">Velocity</option>
-            <option value="heat">Heat</option>
-          </select><span></span></div>
-        <div id="colorControls">
-          <div class="row"><label>Base</label><input id="baseColor" type="color" value="#66ccff"><span></span></div>
-          <div class="row"><label>Gradient A</label><input id="colorA" type="color" value="#00ff88"><span></span></div>
-          <div class="row"><label>Gradient B</label><input id="colorB" type="color" value="#ff9900"><span></span></div>
-        </div>
-        <div id="heatControls">
-          <div class="row"><label for="heatGain">Heat gain</label><input id="heatGain" type="range" min="0" max="1" step="0.01" value="0.15"><input id="heatGainNum" type="number" step="0.01" value="0.15"></div>
-          <div class="row"><label for="heatDecay">Heat decay</label><input id="heatDecay" type="range" min="0" max="3" step="0.05" value="0.6"><input id="heatDecayNum" type="number" step="0.01" value="0.6"></div>
-        </div>
-        <div class="row"><label for="bgColor">Background</label><input id="bgColor" type="color" value="#0d0f1c"><span></span></div>
-        <div class="row"><label for="trail">Trail fade</label><input id="trail" type="range" min="0" max="1" step="0.01" value="1"><input id="trailNum" type="number" step="0.01" value="0.15"></div>
-        <div class="row"><label for="glow">Glow</label><input id="glow" type="range" min="0" max="24" step="0.5" value="0"><input id="glowNum" type="number" step="0.1" value="2"></div>
-        <div class="row"><label for="blendMode">Blend</label>
-          <select id="blendMode"><option value="source-over">Normal</option><option value="lighter">Add (lighter)</option><option value="screen">Screen</option></select><span></span>
-        </div>
-      </div>
-      <div class="hint">Tip: Use the Presets menu in the top bar to quickly load curated setups.</div>
-    </div>
-
-    <!-- Physics -->
-    <div class="tabpane" id="tab-physics" style="display:none;">
-      <div class="section">
-        <h4>Motion + Forces</h4>
-        <div class="row"><label for="sensitivity">Sensitivity (speed x)</label><input id="sensitivity" type="range" min="0" max="8" step="0.1" value="1.2"><input id="sensitivityNum" type="number" step="0.1" value="1.2"></div>
-        <div class="row"><label for="maxSpeed">Max speed (px/s)</label><input id="maxSpeed" type="range" min="100" max="5000" step="50" value="900"><input id="maxSpeedNum" type="number" step="10" value="900"></div>
-        <div class="row"><label for="gravity">Gravity (strength)</label><input id="gravity" type="range" min="-2000" max="2000" step="5" value="120"><input id="gravityNum" type="number" step="5" value="120"></div>
-        <div class="row"><label for="windMag">Global wind (mag)</label><input id="windMag" type="range" min="0" max="2000" step="10" value="0"><input id="windMagNum" type="number" step="10" value="0"></div>
-        <div class="row"><label for="windDir">Global wind (deg)</label><input id="windDir" type="range" min="-360" max="360" step="1" value="0"><input id="windDirNum" type="number" step="1" value="0"></div>
-        <div class="row"><label for="airDrag">Air drag</label><input id="airDrag" type="range" min="0" max="0.5" step="0.005" value="0.02"><input id="airDragNum" type="number" step="0.001" value="0.02"></div>
-      </div>
-      <div class="section">
-        <h4>Boundaries + Mass</h4>
-        <div class="row"><label for="containment">Containment</label>
-          <select id="containment"><option value="box">Box</option><option value="circle">Circle</option></select><span></span></div>
-        <div class="row" id="row-boundary"><label for="boundary">Boundary</label>
-          <select id="boundary"><option value="bounce">Bounce</option><option value="wrap">Wrap</option></select><span></span></div>
-        <div class="row"><label for="bounciness">Bounciness</label><input id="bounciness" type="range" min="0" max="1.2" step="0.02" value="0.9"><input id="bouncinessNum" type="number" step="0.01" value="0.9"></div>
-        <div class="row"><label for="wallFriction">Wall friction</label><input id="wallFriction" type="range" min="0" max="1" step="0.01" value="0.06"><input id="wallFrictionNum" type="number" step="0.01" value="0.06"></div>
-        <div class="row"><label for="massMode">Mass mode</label>
-          <select id="massMode"><option value="area">Area (r^2)</option><option value="linear">Linear (r)</option><option value="uniform">Uniform (1)</option></select><span></span></div>
-
-        <div class="row"><label for="devMotion">Use device motion</label><input id="devMotion" type="checkbox"><span></span></div>
-        <div class="row" id="row-tiltGain"><label for="tiltGain">Tilt gain</label><input id="tiltGain" type="range" min="0" max="4" step="0.05" value="1"><input id="tiltGainNum" type="number" step="0.01" value="1"></div>
-        <div class="row" id="row-tiltSmooth"><label for="tiltSmooth">Tilt smoothing</label><input id="tiltSmooth" type="range" min="0" max="1" step="0.01" value="0.18"><input id="tiltSmoothNum" type="number" step="0.01" value="0.18"></div>
-        <div class="row" id="row-tiltCal"><label>Tilt calibration</label><button id="tiltCalBtn" class="btn">Set level</button><span id="tiltStatus" class="small">Not calibrated</span></div>
-      </div>
-      <div class="section">
-        <h4>Collision Mode</h4>
-        <div class="row"><label for="physMode">Physics mode</label>
-          <select id="physMode"><option value="elastic">Elastic</option><option value="soft">Soft</option><option value="inelastic">Inelastic</option><option value="none">No collisions</option></select><span></span></div>
-        <div class="note small">Detailed collision settings live in the Collisions tab.</div>
-      </div>
-    </div>
-
-    <!-- Collisions -->
-    <div class="tabpane" id="tab-collisions" style="display:none;">
-      <div id="collisionsEnabled">
-        <div class="section">
-          <h4>Solver</h4>
-          <div class="row"><label for="iters">Collision iterations</label><input id="iters" type="range" min="1" max="10" step="1" value="3"><input id="itersNum" type="number" step="1" value="3"></div>
-          <div class="row"><label for="rebuildGrid">Rebuild grid each iter</label><input id="rebuildGrid" type="checkbox" checked><span></span></div>
-          <div class="row"><label for="collFric">Collision friction</label><input id="collFric" type="range" min="0" max="1" step="0.01" value="0.08"><input id="collFricNum" type="number" step="0.01" value="0.08"></div>
-          <div class="row"><label for="autoQuality">Auto quality (FPS)</label><input id="autoQuality" type="checkbox" checked><span></span></div>
-        </div>
-      </div>
-      <div id="collisionsDisabled" class="section" style="display:none;">
-        <h4>Collisions</h4>
-        <div class="note">Collision mode is set to “No collisions”. Switch mode in Physics → Collision Mode to re-enable.</div>
-      </div>
-    </div>
-
-    <!-- Turbulence -->
-    <div class="tabpane" id="tab-turbulence" style="display:none;">
-      <div class="section">
-        <h4>Field</h4>
-        <div class="row"><label for="turbMode">Turbulence mode</label>
-          <select id="turbMode">
-            <option value="off">Off</option>
-            <option value="flow" data-str-min="0" data-str-max="500" data-str-def="100" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="2" data-time-def="0.6">Flow Noise (angle)</option>
-            <option value="curl" data-str-min="0" data-str-max="2000" data-str-def="400" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="2" data-time-def="0.6">Curl Noise (swirly)</option>
-            <option value="vortex" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="2" data-time-def="0.6">Vortex (center/pointer)</option>
-            <option value="wind" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="4" data-time-def="1">Wind Gusts</option>
-            <option value="brownian" data-str-min="0" data-str-max="2000" data-str-def="100" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="2" data-time-def="0.6">Brownian (jitter)</option>
-            <option value="sinwave" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Sin Wave Field</option>
-            <option value="radial" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="2" data-time-def="0.6">Radial (center out/in)</option>
-            <option value="perlin" data-str-min="0" data-str-max="5000" data-str-def="1000" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Perlin (organic)</option>
-            <option value="swirl" data-str-min="0" data-str-max="2000" data-str-def="400" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Swirl (local centers)</option>
-            <option value="pulse" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.05" data-scale-def="0.01" data-time-min="0" data-time-max="4" data-time-def="1">Pulse (wave push/pull)</option>
-            <option value="spiral" data-str-min="0" data-str-max="2000" data-str-def="400" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Spiral (center swirl)</option>
-            <option value="checker" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Checker (grid push/pull)</option>
-            <option value="ripple" data-str-min="0" data-str-max="2000" data-str-def="200" data-scale-min="0.001" data-scale-max="0.1" data-scale-def="0.02" data-time-min="0" data-time-max="4" data-time-def="1">Ripple (concentric waves)</option>
-          </select><span></span></div>
-        <div class="row"><label for="turbStr">Strength</label><input id="turbStr" type="range" min="0" max="2000" step="5" value="100"><input id="turbStrNum" type="number" step="1" value="100"></div>
-        <div class="row" id="row-turbScale"><label for="turbScale">Scale</label><input id="turbScale" type="range" min="0.0001" max="0.05" step="0.0001" value="0.004"><input id="turbScaleNum" type="number" step="0.0001" value="0.004"></div>
-        <div class="row" id="row-turbTime"><label for="turbTime">Time speed</label><input id="turbTime" type="range" min="0" max="4" step="0.01" value="0.6"><input id="turbTimeNum" type="number" step="0.01" value="0.6"></div>
-        <div class="row" id="row-turbPointer"><label for="turbUsePointer">Vortex uses pointer</label><input id="turbUsePointer" type="checkbox"><span></span></div>
-      </div>
-      <div class="section small"><span class="badge">Seed</span> Noise seed is in Advanced. Reseed for different flow patterns.</div>
-    </div>
-
-    <!-- Interaction -->
-    <div class="tabpane" id="tab-interaction" style="display:none;">
-      <div class="section">
-        <h4>Pointer</h4>
-        <div class="row"><label for="pointerMode">Mode</label>
-          <select id="pointerMode">
-            <option value="off">Off</option>
-            <option value="attract_lin">Attract (linear)</option>
-            <option value="attract_inv">Attract (inverse sq)</option>
-            <option value="repel_lin">Repel (linear)</option>
-            <option value="repel_inv">Repel (inverse sq)</option>
-            <option value="swirl_cw">Swirl (CW)</option>
-            <option value="swirl_ccw">Swirl (CCW)</option>
-            <option value="drag">Drag (follow)</option>
-            <option value="freeze">Freeze</option>
-            <option value="impulse_out">Impulse: explode (click)</option>
-            <option value="impulse_in">Impulse: implode (click)</option>
-          </select><span></span></div>
-        <div class="row" id="row-pointerStr"><label for="pointerStr">Strength</label><input id="pointerStr" type="range" min="0" max="20000" step="50" value="3000"><input id="pointerStrNum" type="number" step="10" value="3000"></div>
-        <div class="row" id="row-pointerRad"><label for="pointerRad">Radius</label><input id="pointerRad" type="range" min="10" max="2000" step="10" value="240"><input id="pointerRadNum" type="number" step="10" value="240"></div>
-        <div class="row" id="row-pointerExp"><label for="pointerExp">Falloff exponent</label><input id="pointerExp" type="range" min="0" max="6" step="0.1" value="2"><input id="pointerExpNum" type="number" step="0.1" value="2"></div>
-        <div class="row" id="row-impulseMag"><label for="impulseMag">Click impulse</label><input id="impulseMag" type="range" min="0" max="20000" step="50" value="6000"><input id="impulseMagNum" type="number" step="10" value="6000"></div>
-        <div class="small">Impulse applies on click/tap. Drag/freeze use pointer velocity/strength within radius.</div>
-      </div>
-    </div>
-
-    <!-- Advanced -->
-    <div class="tabpane" id="tab-advanced" style="display:none;">
-      <div class="section">
-        <h4>Engine</h4>
-        <div class="row"><label for="fixedHz">Fixed timestep (Hz)</label><input id="fixedHz" type="range" min="30" max="480" step="10" value="120"><input id="fixedHzNum" type="number" step="1" value="120"></div>
-        <div class="row"><label for="maxSteps">Max substeps</label><input id="maxSteps" type="range" min="1" max="16" step="1" value="8"><input id="maxStepsNum" type="number" step="1" value="8"></div>
-        <div class="row"><label for="seed">Noise seed</label><input id="seed" type="range" min="0" max="99999" step="1" value="1337"><input id="seedNum" type="number" step="1" value="1337"></div>
-      </div>
-      <div class="section small">
-        Adaptive quality reduces iterations when FPS drops and restores them when FPS recovers.
+        <button id="enableTilt" class="primary">Enable Tilt</button>
+        <button id="dismissTilt">Dismiss</button>
       </div>
     </div>
   </div>
 
-  <div class="btnbar">
-    <button id="resetBtn" class="btn" title="Reset (R)">♻️ Reset</button>
-    <button id="randomizeBtn" class="btn">🎲 Randomize</button>
-    <button id="reseedBtn" class="btn">🌱 Reseed</button>
-    <button id="saveBtn" class="btn">📷 Save PNG</button>
-    <div class="hint small" style="flex:1 1 auto; text-align:right;">
-      Shortcuts: <span class="kbd">Space</span> pause · <span class="kbd">R</span> reset · <span class="kbd">U</span> UI ·
-      <span class="kbd">C</span> color · <span class="kbd">S</span> shape · <span class="kbd">M</span> physics ·
-      <span class="kbd">B</span> boundary · <span class="kbd">Q</span> turbulence · <span class="kbd">T</span> trails ·
-      <span class="kbd">G</span> gravity · <span class="kbd">+/−</span> count
-    </div>
-  </div>
-</div>
-
-<script src="js/utils.js"></script>
-<script src="js/simulation_core.js"></script>
-<script src="js/simulation_physics.js"></script>
-<script src="js/simulation_render_loop.js"></script>
-<script src="js/ui-dom.js"></script>
-<script src="js/ui-interaction.js"></script>
-<script src="js/ui-logic.js"></script>
-<script src="js/ui-init-wire.js"></script>
-
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
