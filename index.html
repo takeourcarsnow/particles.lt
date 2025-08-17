@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+      /* Hide the tilt prompt panel */
+      .tilt-prompt-panel, #tilt-prompt-panel {
+        display: none !important;
+      }
+    </style>
 <title>Particle Tilt Playground — Containers + Extra Turbulence</title>
 <style>
   :root{
@@ -92,6 +98,10 @@
   .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0e1423;color:#8ea0b7;font-size:12px;margin-right:6px}
   .flex{display:flex;gap:8px;align-items:center}
   a, a:visited{text-decoration:none;color:var(--accent)}
+      /* Force hide the tilt prompt panel */
+      #tiltPrompt {
+        display: none !important;
+      }
 </style>
 </head>
 <body>
@@ -1415,7 +1425,7 @@
       const gv = Settings.controls.mouseSetsGravity ? mouseGravity : gDir;
       ctx.beginPath();
       ctx.moveTo(cxv,cyv);
-      ctx.lineTo(cxv + gv.x*40, cyv + gv.y*40);
+      ctx.lineTo(cxv + gv.x*0, cyv + gv.y*0); //set zeros back to 40 for gravity on screen indicator to appear
       ctx.stroke();
 
       stepOnce=false;
