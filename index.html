@@ -259,8 +259,8 @@
     },
     performance: {
       simSpeed: 1.0,
-      substeps: 1,
-      adaptive: true,
+      substeps: 3,
+      adaptive: false,
       lowFpsThreshold: 45,
       maxParticles: 8000,
       collisionCap: 12 // max neighbor pairs per particle (soft limit)
@@ -787,9 +787,9 @@
         ctrlRange(gc,'physics.container.cx','Center X (norm)',0,1,0.01,v=>v.toFixed(2));
         ctrlRange(gc,'physics.container.cy','Center Y (norm)',0,1,0.01,v=>v.toFixed(2));
         if(mode==='container-circle'){
-          ctrlRange(gc,'physics.container.radiusN','Radius (norm)',0.05,0.49,0.005,v=>v.toFixed(3));
+          ctrlRange(gc,'physics.container.radiusN','Radius (norm)',0.05,0.8,0.005,v=>v.toFixed(3));
         }else{
-          ctrlRange(gc,'physics.container.sizeN','Half-size (norm)',0.05,0.49,0.005,v=>v.toFixed(3));
+          ctrlRange(gc,'physics.container.sizeN','Half-size (norm)',0.05,0.8,0.005,v=>v.toFixed(3));
         }
         contentEl.append(gc);
       }
@@ -903,7 +903,7 @@
     if(id==='performance'){
       const g = group('Performance');
       ctrlRange(g,'performance.simSpeed','Simulation speed',0.1,2,0.01,v=>v.toFixed(2));
-      ctrlRange(g,'performance.substeps','Substeps',1,3,1,v=>v.toFixed(0), v=>{ substeps = Math.round(v); });
+      ctrlRange(g,'performance.substeps','Substeps',1,9,1,v=>v.toFixed(0), v=>{ substeps = Math.round(v); });
       ctrlCheck(g,'performance.adaptive','Adaptive mode');
       ctrlRange(g,'performance.lowFpsThreshold','Low FPS threshold',20,58,1,v=>v.toFixed(0));
       ctrlRange(g,'performance.collisionCap','Neighbor cap',4,48,1,v=>v.toFixed(0));
