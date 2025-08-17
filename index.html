@@ -120,6 +120,7 @@
     <button class="btn" id="pauseBtn">Pause</button>
     <button class="btn" id="stepBtn" title="Step one frame">Step</button>
     <button class="btn" id="resetBtn" title="Reset particles">Reset</button>
+    <button class="btn" id="fullscreenBtn">Fullscreen</button>
   </div>
 </div>
 
@@ -341,6 +342,7 @@
     pauseBtn: document.getElementById('pauseBtn'),
     stepBtn: document.getElementById('stepBtn'),
     resetBtn: document.getElementById('resetBtn'),
+    fullscreenBtn: document.getElementById('fullscreenBtn')
   };
 
   // Device tilt prompt
@@ -995,6 +997,38 @@
     setTimeout(()=>{ tiltPrompt.hidden = false; }, 600);
   }
 
+  // ---------- Fullscreen helpers ----------
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function requestFullscreen(elem) {
+    if (elem.requestFullscreen) return elem.requestFullscreen();
+    if (elem.webkitRequestFullscreen) return elem.webkitRequestFullscreen();
+    if (elem.msRequestFullscreen) return elem.msRequestFullscreen();
+  }
+  function exitFullscreen() {
+    if (document.exitFullscreen) return document.exitFullscreen();
+    if (document.webkitExitFullscreen) return document.webkitExitFullscreen();
+    if (document.msExitFullscreen) return document.msExitFullscreen();
+  }
+  function updateFullscreenBtn() {
+    const btn = document.getElementById('fullscreenBtn');
+    if (!btn) return;
+    btn.textContent = isFullscreen() ? 'Exit Fullscreen' : 'Fullscreen';
+  }
+
+  // Fullscreen button logic
+  hud.fullscreenBtn.addEventListener('click', function() {
+    if (!isFullscreen()) {
+      requestFullscreen(document.documentElement);
+    } else {
+      exitFullscreen();
+    }
+  });
+  document.addEventListener('fullscreenchange', updateFullscreenBtn);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+  updateFullscreenBtn();
+
   // Spatial hash
   function buildGrid(){
     grid.clear();
@@ -1012,7 +1046,7 @@
     const res = [];
     const cell = gridCell;
     const p = particles[i];
-    const cx = (p.x/cell)|0, cy=(p.y/cell)|0;
+    const cx = (p.x/cell)|0, cy = (p.y/cell)|0;
     for(let ox=-1; ox<=1; ox++){
       for(let oy=-1; oy<=1; oy++){
         const key = ((cx+ox)<<16) ^ (cy+oy);
