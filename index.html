@@ -820,7 +820,7 @@
         {value:'swirlgrid',name:'Swirl Grid'},
         {value:'wells',name:'Wells (multi-attractor)'}
       ], ()=>showTab('forces'));
-      ctrlRange(g,'forces.amplitude','Amplitude',0,1600,10,v=>v.toFixed(0));
+      ctrlRange(g,'forces.amplitude','Amplitude',0,300,1,v=>v.toFixed(0));
       ctrlRange(g,'forces.scale','Scale',0.0005,0.02,0.0005,v=>v.toFixed(4));
       ctrlRange(g,'forces.timeScale','Time scale',0,2,0.01,v=>v.toFixed(2));
       contentEl.append(g);
@@ -1558,3 +1558,4 @@
 </body>
 
 </html>
+
