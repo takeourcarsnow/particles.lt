@@ -1,0 +1,96 @@
+/* Hide the tilt prompt panel (force) */
+.tilt-prompt-panel, #tilt-prompt-panel {
+  display: none !important;
+}
+
+:root{
+  --bg: #0b0e14;
+  --panel: #121622ee;
+  --panel2:#0f1320ee;
+  --text:#e6edf3;
+  --muted:#96a0aa;
+  --accent:#6ae3ff;
+  --accent2:#9b7bff;
+  --good:#79ffa1;
+  --warn:#ffcc66;
+  --bad:#ff6677;
+  --border:#202533;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;}
+canvas{position:fixed;inset:0;width:100vw;height:100vh;touch-action:none;display:block;}
+#hud{
+  position:fixed;top:10px;left:10px;z-index:10;
+  background:linear-gradient(180deg,#0f141d 0%, #0a0d14 100%);
+  color:var(--text);border:1px solid var(--border);border-radius:10px;
+  padding:8px 12px;font-size:12px;line-height:1.4;backdrop-filter: blur(6px);
+  box-shadow:0 6px 20px rgba(0,0,0,0.25);
+}
+#hud .row{display:flex;gap:12px;flex-wrap:wrap}
+#hud .tag{padding:2px 8px;border-radius:999px;background:#0d111a;border:1px solid var(--border);color:var(--muted)}
+#hud .tag b{color:var(--text)}
+#hud .mode{color:var(--accent)}
+#hud .btn{
+  margin-left:6px; padding:2px 8px;border-radius:6px;border:1px solid var(--border);
+  background:#0e1220;color:var(--text);cursor:pointer;font-weight:600;
+}
+#hud .btn:hover{border-color:#2a2f40}
+#panel{
+  position:fixed;right:14px;top:14px;bottom:14px;width:min(420px,92vw);
+  display:flex;flex-direction:column;z-index:20;background:var(--panel);
+  border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  backdrop-filter: blur(8px); box-shadow:0 10px 30px rgba(0,0,0,0.35);
+}
+#panelHeader{
+  display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#1a2030, #141a28);
+}
+#panelHeader .title{font-weight:800;letter-spacing:.3px}
+#panelHeader .actions{display:flex;gap:8px}
+#panelHeader button{
+  padding:8px 10px;border-radius:10px;background:#0f1524;border:1px solid var(--border);color:var(--text);cursor:pointer;font-weight:700
+}
+#panelHeader button.primary{background:linear-gradient(180deg,#2a3553,#222a42);border-color:#2f3755}
+#tabs{display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;border-bottom:1px solid var(--border);background:var(--panel2)}
+#tabs button{
+  padding:6px 10px;border-radius:999px;background:#0e1423;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-weight:600;font-size:12px
+}
+#tabs button.active{color:var(--text);background:linear-gradient(180deg,#18203a,#121a30);border-color:#2a2f40}
+#content{flex:1;overflow:auto;padding:14px}
+.group{border:1px solid var(--border);border-radius:12px;padding:10px 10px;margin-bottom:12px;background:rgba(10,12,18,0.55)}
+.group h3{margin:0 0 8px 0;font-size:13px;letter-spacing:.2px;color:#a9b3c0}
+.ctrl{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin:8px 0}
+.ctrl label{font-size:12px;color:#b4beca}
+.ctrl input[type="range"]{width:170px}
+.ctrl input[type="color"]{width:40px;height:28px;border:none;background:transparent}
+.ctrl select,.ctrl input[type="number"],.ctrl input[type="text"]{
+  background:#0d1322;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 8px;min-width:140px
+}
+.ctrl .value{font-variant-numeric:tabular-nums;color:#cdd6e3;font-size:12px;}
+.rowline{display:flex;gap:6px;flex-wrap:wrap}
+.smallnote{font-size:11px;color:#8c97a6}
+.footerNote{font-size:11px;color:#7e8796;margin-top:6px;text-align:center}
+#tiltPrompt{
+  position:fixed;inset:auto 0 0 0;z-index:15;background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.5));
+  display:flex;justify-content:center;align-items:flex-end;padding:16px;pointer-events:none;
+}
+#tiltPrompt .bubble{
+  pointer-events:auto; background:#12182a;border:1px solid var(--border);border-radius:14px; padding:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35); max-width:min(560px,92vw);
+}
+#tiltPrompt .bubble .row{display:flex;gap:8px;align-items:center}
+#tiltPrompt .bubble button{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1524;color:#fff;font-weight:700;cursor:pointer}
+#tiltPrompt .bubble button.primary{background:linear-gradient(180deg,#2a3553,#222a42);border-color:#2f3755}
+#togglePanel{
+  position:fixed;left:10px;bottom:10px;z-index:30;background:#10162a;border:1px solid var(--border);
+  color:var(--text);border-radius:999px;padding:8px 10px;cursor:pointer;font-weight:800;
+}
+#togglePanel small{color:#98a3b0}
+#panel.hidden{display:none}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#0e1423;color:#8ea0b7;font-size:12px;margin-right:6px}
+.flex{display:flex;gap:8px;align-items:center}
+a, a:visited{text-decoration:none;color:var(--accent)}
+/* Force hide the tilt prompt panel */
+#tiltPrompt {
+  display: none !important;
+}
