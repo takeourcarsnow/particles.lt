@@ -110,11 +110,15 @@
 <div id="hud">
   <div class="row">
     <span class="tag">FPS: <b id="fps">0</b></span>
-    <span class="tag">Particles: <b id="pcount">0</b></span>
-    <span class="tag">Collisions: <b id="collMode">elastic</b></span>
-    <span class="tag">Turbulence: <b id="turbMode">none</b></span>
-    <span class="tag">Tilt: <b id="tiltState">off</b></span>
-    <span class="tag">Mouse Gravity: <b id="mouseG">on</b></span>
+  <span class="tag">Gravity: <b id="gravityVal" class="clickable">40</b></span>
+  <span class="tag">Particles: <b id="countVal" class="clickable">1200</b></span>
+  <span class="tag">Collisions: <b id="collMode" class="clickable">elastic</b></span>
+  <span class="tag">Turbulence: <b id="turbMode" class="clickable">none</b></span>
+  <span class="tag">Tilt: <b id="tiltState" class="clickable">off</b></span>
+  <span class="tag">Mouse Gravity: <b id="mouseG" class="clickable">on</b></span>
+  <span class="tag">Shape: <b id="shapeMode" class="clickable">circle</b></span>
+  <span class="tag">Color: <b id="colorMode" class="clickable">velocity</b></span>
+  <span class="tag">Boundaries: <b id="boundMode" class="clickable">screen-bounce</b></span>
   </div>
   <div class="row" style="margin-top:6px">
     <button class="btn" id="pauseBtn">Pause</button>
@@ -334,11 +338,15 @@
   // HUD elements
   const hud = {
     fps: document.getElementById('fps'),
-    pcount: document.getElementById('pcount'),
     collMode: document.getElementById('collMode'),
     turbMode: document.getElementById('turbMode'),
     tiltState: document.getElementById('tiltState'),
     mouseG: document.getElementById('mouseG'),
+  gravityVal: document.getElementById('gravityVal'),
+  countVal: document.getElementById('countVal'),
+  shapeMode: document.getElementById('shapeMode'),
+  colorMode: document.getElementById('colorMode'),
+  boundMode: document.getElementById('boundMode'),
     pauseBtn: document.getElementById('pauseBtn'),
     stepBtn: document.getElementById('stepBtn'),
     resetBtn: document.getElementById('resetBtn'),
@@ -713,12 +721,12 @@
         rebuildParticles(true); showTab('particles');
       });
 
+      ctrlRange(g1, 'particles.count', 'Count', 0, Settings.performance.maxParticles, 1, v=>v, v=>rebuildParticles(true));
       if(Settings.particles.uniformSize){
         ctrlRange(g1, 'particles.radiusMax', 'Size', 0.5, 20, 0.5, v=>v.toFixed(1), (v)=>{
           Settings.particles.radiusMin = v; applyUniformRadius();
         });
       }else{
-        ctrlRange(g1, 'particles.count', 'Count', 0, Settings.performance.maxParticles, 1, v=>v, v=>rebuildParticles(true));
         ctrlRange(g1, 'particles.radiusMin', 'Size min', 0.5, 12, 0.5, v=>v.toFixed(1), v=>{ if(Settings.particles.radiusMin>Settings.particles.radiusMax){Settings.particles.radiusMax=Settings.particles.radiusMin; } rebuildParticles(true); });
         ctrlRange(g1, 'particles.radiusMax', 'Size max', 0.5, 20, 0.5, v=>v.toFixed(1), v=>{ if(Settings.particles.radiusMax<Settings.particles.radiusMin){Settings.particles.radiusMin=Settings.particles.radiusMax;} rebuildParticles(true); });
       }
@@ -985,12 +993,66 @@
 
   // HUD update
   function updateHUD(){
-    hud.pcount.textContent = particles.length;
     hud.collMode.textContent = Settings.collisions.mode;
     hud.turbMode.textContent = Settings.forces.turbulenceMode;
     hud.tiltState.textContent = tiltEnabled? 'on':'off';
     hud.mouseG.textContent = Settings.controls.mouseSetsGravity? 'on':'off';
+    hud.gravityVal.textContent = Settings.physics.gravity;
+    hud.countVal.textContent = Settings.particles.count;
+    hud.shapeMode.textContent = Settings.particles.shape;
+    hud.colorMode.textContent = Settings.particles.colorMode;
+    hud.boundMode.textContent = Settings.physics.boundaries;
   }
+  // Clickable gravity and count
+  hud.gravityVal.title = 'Click to set gravity';
+  hud.gravityVal.style.cursor = 'pointer';
+  hud.gravityVal.addEventListener('click', function() {
+    let val = prompt('Set gravity (0-1200):', Settings.physics.gravity);
+    if(val!==null){
+      let g = Math.max(0, Math.min(1200, parseFloat(val)));
+      Settings.physics.gravity = g;
+      updateHUD();
+    }
+  });
+  hud.countVal.title = 'Click to set particle count';
+  hud.countVal.style.cursor = 'pointer';
+  hud.countVal.addEventListener('click', function() {
+    let val = prompt('Set particle count (1-'+Settings.performance.maxParticles+'):', Settings.particles.count);
+    if(val!==null){
+      let c = Math.max(1, Math.min(Settings.performance.maxParticles, parseInt(val)));
+      Settings.particles.count = c;
+      rebuildParticles(true);
+      updateHUD();
+    }
+  });
+  // Make HUD settings clickable to cycle through options
+  function cycleSetting(obj, key, options, onChange) {
+    obj.addEventListener('click', function() {
+      let val = key.reduce((a, k) => a[k], Settings);
+      let idx = options.indexOf(val);
+      let next = options[(idx + 1) % options.length];
+      let target = Settings;
+      for (let i = 0; i < key.length - 1; i++) target = target[key[i]];
+      target[key[key.length - 1]] = next;
+      if (onChange) onChange(next);
+      updateHUD();
+      if (key[0] === 'particles') rebuildParticles(false);
+      if (key[0] === 'physics' && key[1] === 'boundaries') rebuildParticles(false);
+    });
+    obj.title = 'Click to cycle';
+    obj.style.cursor = 'pointer';
+  }
+
+  cycleSetting(hud.collMode, ['collisions','mode'], ['elastic','soft','inelastic','none'], null);
+  cycleSetting(hud.turbMode, ['forces','turbulenceMode'], ['none','flow','curl','vortex','wind','jets','swirlgrid','wells'], null);
+  cycleSetting(hud.tiltState, [], [], function(){
+    tiltEnabled = !tiltEnabled;
+    updateHUD();
+  });
+  cycleSetting(hud.mouseG, ['controls','mouseSetsGravity'], [true,false], null);
+  cycleSetting(hud.shapeMode, ['particles','shape'], ['circle','square','triangle'], function(){ rebuildParticles(false); });
+  cycleSetting(hud.colorMode, ['particles','colorMode'], ['solid','velocity','heat'], null);
+  cycleSetting(hud.boundMode, ['physics','boundaries'], ['screen-bounce','screen-wrap','none','container-circle','container-square'], function(){ rebuildParticles(false); });
   updateHUD();
 
   if(haveDeviceOrientation){
