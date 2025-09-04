@@ -99,7 +99,7 @@ export const Settings = {
     collisionCap: 12
   },
   controls: {
-    mouseSetsGravity: true
+    mouseSetsGravity: false
   }
 };
 
@@ -139,4 +139,5 @@ export const PRESETS = {
     forces: { turbulenceMode:'none' },
     visuals: { trail:0.03, background:'#0b0e14', showContainer:true }
   })
+
 };
